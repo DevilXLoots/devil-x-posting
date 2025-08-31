@@ -158,18 +158,8 @@
   </nav>
 
   <main>
-    <div id="posts">
-      <p id="emptyMsg" style="text-align:center; color:gray;">NO CONTENT IS AVAILABLE</p>
-    </div>
-
-    <div id="channelInfo" style="display:none;">
-      <h2>My Channel</h2>
-      <p><b>Name:</b> <span id="myName">Not Set</span></p>
-      <p><b>Username:</b> <span id="myUser">@notset</span></p>
-      <img id="myLogo" src="" alt="No Logo" style="width:60px;height:60px;border-radius:50%;background:#333;">
-      <br><br>
-      <button onclick="openEditChannel()">Edit Channel</button>
-    </div>
+    <div id="posts"></div>
+    <div id="channelInfo" style="display:none;"></div>
   </main>
 
   <div class="fab" onclick="openUploadModal()">+</div>
@@ -199,21 +189,25 @@
 
   <script>
     const postsDiv = document.getElementById("posts");
+    const channelInfoDiv = document.getElementById("channelInfo");
     let posts = JSON.parse(localStorage.getItem("posts") || "[]");
     let channel = JSON.parse(localStorage.getItem("channel") || "null");
 
     renderPosts();
-    updateChannelInfo();
+    switchTab("posts");
 
-    document.getElementById("tabPosts").onclick = () => switchTab("posts");
-    document.getElementById("tabChannel").onclick = () => switchTab("channelInfo");
-    document.getElementById("searchInput").onkeyup = searchChannel;
+    document.getElementById("tabPosts").onclick = () => { switchTab("posts"); renderPosts(); };
+    document.getElementById("tabChannel").onclick = () => { switchTab("channel"); renderMyChannel(); };
+
+    document.getElementById("searchInput").addEventListener("keyup", (e) => {
+      if (e.key === "Enter") searchChannel();
+    });
 
     function switchTab(tab) {
-      document.getElementById("posts").style.display = tab === "posts" ? "block" : "none";
-      document.getElementById("channelInfo").style.display = tab === "channelInfo" ? "block" : "none";
+      postsDiv.style.display = tab === "posts" ? "block" : "none";
+      channelInfoDiv.style.display = tab === "channel" ? "block" : "none";
       document.getElementById("tabPosts").classList.toggle("active", tab === "posts");
-      document.getElementById("tabChannel").classList.toggle("active", tab === "channelInfo");
+      document.getElementById("tabChannel").classList.toggle("active", tab === "channel");
     }
 
     function openUploadModal() {
@@ -248,7 +242,7 @@
       if (logoFile) logoUrl = await readFileAsDataURL(logoFile);
       channel = { name, username, logo: logoUrl };
       localStorage.setItem("channel", JSON.stringify(channel));
-      updateChannelInfo();
+      renderMyChannel();
       closeModal("channelModal");
     }
 
@@ -272,6 +266,7 @@
       posts.unshift(newPost);
       localStorage.setItem("posts", JSON.stringify(posts));
       renderPosts();
+      renderMyChannel();
       closeModal("uploadModal");
       document.getElementById("caption").value = "";
       document.getElementById("photo").value = "";
@@ -283,62 +278,96 @@
         postsDiv.innerHTML = '<p style="text-align:center; color:gray;">NO CONTENT IS AVAILABLE</p>';
         return;
       }
-      list.forEach(post => {
-        const postDiv = document.createElement("div");
-        postDiv.className = "post";
-        const header = document.createElement("div");
-        header.className = "post-header";
-        if (post.logo) {
-          const logoImg = document.createElement("img");
-          logoImg.src = post.logo;
-          header.appendChild(logoImg);
-        }
-        const infoDiv = document.createElement("div");
-        infoDiv.className = "channel-info";
-        infoDiv.innerHTML = `<b>${post.channelName}</b><span>${post.channelUsername}</span>`;
-        header.appendChild(infoDiv);
-        postDiv.appendChild(header);
-        if (post.photo) {
-          const img = document.createElement("img");
-          img.src = post.photo;
-          img.className = "post-photo";
-          postDiv.appendChild(img);
-        }
-        if (post.caption) {
-          const p = document.createElement("div");
-          p.className = "caption";
-          p.textContent = post.caption;
-          postDiv.appendChild(p);
-        }
+      list.forEach(post => postsDiv.appendChild(makePost(post)));
+    }
+
+    function renderMyChannel() {
+      channelInfoDiv.innerHTML = "";
+      if (!channel) {
+        channelInfoDiv.innerHTML = `<p>You don't have a channel yet.</p>
+          <button onclick="openEditChannel()">Create Channel</button>`;
+        return;
+      }
+      channelInfoDiv.innerHTML = `
+        <h2>${channel.name}</h2>
+        <p><b>Username:</b> ${channel.username}</p>
+        <img src="${channel.logo}" style="width:60px;height:60px;border-radius:50%;background:#333;">
+        <br><br>
+        <button onclick="openEditChannel()">Edit Channel</button>
+        <h3>My Posts</h3>
+      `;
+      let myPosts = posts.filter(p => p.channelUsername === channel.username);
+      if (myPosts.length === 0) {
+        channelInfoDiv.innerHTML += `<p style="color:gray;">No posts yet.</p>`;
+      } else {
+        myPosts.forEach(p => channelInfoDiv.appendChild(makePost(p)));
+      }
+    }
+
+    function makePost(post) {
+      const postDiv = document.createElement("div");
+      postDiv.className = "post";
+      const header = document.createElement("div");
+      header.className = "post-header";
+      if (post.logo) {
+        const logoImg = document.createElement("img");
+        logoImg.src = post.logo;
+        header.appendChild(logoImg);
+      }
+      const infoDiv = document.createElement("div");
+      infoDiv.className = "channel-info";
+      infoDiv.innerHTML = `<b>${post.channelName}</b><span>${post.channelUsername}</span>`;
+      header.appendChild(infoDiv);
+      postDiv.appendChild(header);
+      if (post.photo) {
+        const img = document.createElement("img");
+        img.src = post.photo;
+        img.className = "post-photo";
+        postDiv.appendChild(img);
+      }
+      if (post.caption) {
+        const p = document.createElement("div");
+        p.className = "caption";
+        p.textContent = post.caption;
+        postDiv.appendChild(p);
+      }
+      if (channel && post.channelUsername === channel.username) {
         const delBtn = document.createElement("button");
         delBtn.className = "delete-btn";
         delBtn.textContent = "Delete Post";
         delBtn.onclick = () => deletePost(post.id);
         postDiv.appendChild(delBtn);
-        postsDiv.appendChild(postDiv);
-      });
+      }
+      return postDiv;
     }
 
     function deletePost(id) {
       posts = posts.filter(p => p.id !== id);
       localStorage.setItem("posts", JSON.stringify(posts));
       renderPosts();
-    }
-
-    function updateChannelInfo() {
-      document.getElementById("myName").textContent = channel ? channel.name : "Not Set";
-      document.getElementById("myUser").textContent = channel ? channel.username : "@notset";
-      document.getElementById("myLogo").src = channel && channel.logo ? channel.logo : "";
+      renderMyChannel();
     }
 
     function searchChannel() {
       let query = document.getElementById("searchInput").value.trim().toLowerCase();
       if (!query) {
         renderPosts();
+        switchTab("posts");
         return;
       }
-      const filtered = posts.filter(p => p.channelUsername.toLowerCase().includes(query));
-      renderPosts(filtered);
+      if (!query.startsWith("@")) query = "@" + query;
+      const userPosts = posts.filter(p => p.channelUsername.toLowerCase() === query);
+      if (userPosts.length === 0) {
+        postsDiv.innerHTML = `<p style="text-align:center; color:gray;">No channel found for ${query}</p>`;
+        switchTab("posts");
+      } else {
+        channelInfoDiv.innerHTML = `<h2>${userPosts[0].channelName}</h2>
+          <p><b>Username:</b> ${userPosts[0].channelUsername}</p>
+          <img src="${userPosts[0].logo}" style="width:60px;height:60px;border-radius:50%;background:#333;">
+          <h3>Posts</h3>`;
+        userPosts.forEach(p => channelInfoDiv.appendChild(makePost(p)));
+        switchTab("channel");
+      }
     }
 
     function readFileAsDataURL(file) {
