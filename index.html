@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Upload Web</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      text-align: center;
+    }
+    .post {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 15px 0;
+      text-align: left;
+      background: #f9f9f9;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .channel-info {
+      font-size: 14px;
+    }
+    .channel-info b {
+      display: block;
+    }
+    img.post-photo {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    button.delete-btn {
+      margin-top: 8px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload Something</h1>
+
+  <form id="uploadForm">
+    <h3>Channel Info</h3>
+    <input type="file" id="logo" accept="image/*"><br><br>
+    <input type="text" id="channelName" placeholder="Channel Name" required><br><br>
+    <input type="text" id="channelUsername" placeholder="@ChannelUsername" required><br><br>
+
+    <h3>Post Content</h3>
+    <textarea id="caption" placeholder="Write a caption..." rows="3" style="width:100%;"></textarea><br><br>
+    <input type="file" id="photo" accept="image/*"><br><br>
+    <button type="submit">Upload</button>
+  </form>
+
+  <h2>Posts</h2>
+  <div id="posts">
+    <p id="emptyMsg">NO CONTENT IS AVAILABLE</p>
+  </div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const postsDiv = document.getElementById("posts");
+    const emptyMsg = document.getElementById("emptyMsg");
+
+    // Load saved posts from localStorage
+    let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+    renderPosts();
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const caption = document.getElementById("caption").value.trim();
+      const photo = document.getElementById("photo").files[0];
+      const logo = document.getElementById("logo").files[0];
+      const channelName = document.getElementById("channelName").value.trim();
+      const channelUsername = document.getElementById("channelUsername").value.trim();
+
+      if (!caption && !photo) {
+        alert("Please add a caption or photo!");
+        return;
+      }
+
+      // Handle file uploads (logo + post photo)
+      const readers = [];
+      if (logo) {
+        readers.push(readFileAsDataURL(logo));
+      } else {
+        readers.push(Promise.resolve(null));
+      }
+      if (photo) {
+        readers.push(readFileAsDataURL(photo));
+      } else {
+        readers.push(Promise.resolve(null));
+      }
+
+      Promise.all(readers).then(([logoUrl, photoUrl]) => {
+        const newPost = {
+          id: Date.now(),
+          caption,
+          photo: photoUrl,
+          logo: logoUrl,
+          channelName,
+          channelUsername
+        };
+
+        posts.unshift(newPost);
+        localStorage.setItem("posts", JSON.stringify(posts));
+
+        renderPosts();
+        form.reset();
+      });
+    });
+
+    function renderPosts() {
+      postsDiv.innerHTML = "";
+
+      if (posts.length === 0) {
+        postsDiv.innerHTML = '<p id="emptyMsg">NO CONTENT IS AVAILABLE</p>';
+        return;
+      }
+
+      posts.forEach(post => {
+        const postDiv = document.createElement("div");
+        postDiv.className = "post";
+
+        // Channel header
+        const header = document.createElement("div");
+        header.className = "post-header";
+
+        if (post.logo) {
+          const logoImg = document.createElement("img");
+          logoImg.src = post.logo;
+          header.appendChild(logoImg);
+        }
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "channel-info";
+        infoDiv.innerHTML = `<b>${post.channelName}</b><span>${post.channelUsername}</span>`;
+        header.appendChild(infoDiv);
+
+        postDiv.appendChild(header);
+
+        // Post photo
+        if (post.photo) {
+          const img = document.createElement("img");
+          img.src = post.photo;
+          img.className = "post-photo";
+          postDiv.appendChild(img);
+        }
+
+        // Caption
+        if (post.caption) {
+          const p = document.createElement("p");
+          p.textContent = post.caption;
+          postDiv.appendChild(p);
+        }
+
+        // Delete button
+        const delBtn = document.createElement("button");
+        delBtn.className = "delete-btn";
+        delBtn.textContent = "Delete Post";
+        delBtn.onclick = () => deletePost(post.id);
+        postDiv.appendChild(delBtn);
+
+        postsDiv.appendChild(postDiv);
+      });
+    }
+
+    function deletePost(id) {
+      posts = posts.filter(p => p.id !== id);
+      localStorage.setItem("posts", JSON.stringify(posts));
+      renderPosts();
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
+</body>
+</html>
