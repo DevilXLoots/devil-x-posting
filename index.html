@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>😈 DevilWall</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial; margin: 0; background: #000; color: #fff; }
-    header { background: #111; color: #ff0000; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #007bff; }
-    nav { display: flex; background: #1a1a1a; }
-    nav button { flex: 1; padding: 12px; background: none; border: none; color: white; font-size: 15px; cursor: pointer; }
-    nav button.active { background: #007bff; }
-    nav input { flex: 2; padding: 8px; background: #000; color: #fff; border: 1px solid #333; }
-    main { padding: 15px; }
-    .post { background: #111; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.6); overflow: hidden; }
-    .post-header { display: flex; align-items: center; padding: 10px; }
-    .post-header img { width: 45px; height: 45px; border-radius: 50%; margin-right: 10px; }
-    .channel-info b { display: block; font-size: 15px; }
-    .channel-info span { color: #aaa; font-size: 13px; }
-    img.post-photo { width: 100%; max-height: 400px; object-fit: cover; }
-    .caption { padding: 10px; font-size: 15px; }
-    .delete-btn { margin: 10px; background: red; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-    .fab { position: fixed; bottom: 20px; right: 20px; background: #ff0000; color: white; font-size: 30px; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.5); z-index: 20; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 30; }
-    .modal-content { background: #111; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; color: #fff; }
-    .modal-content input, .modal-content textarea, .modal-content button { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: 1px solid #333; font-size: 14px; background: #222; color: #fff; }
-    .modal-content button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
-  </style>
+<meta charset="UTF-8">
+<title>😈 DevilWall</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family: Arial; margin: 0; background: #000; color: #fff; }
+header { background: #111; color: #ff0000; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #007bff; }
+nav { display: flex; background: #1a1a1a; }
+nav button { flex: 1; padding: 12px; background: none; border: none; color: white; font-size: 15px; cursor: pointer; }
+nav button.active { background: #007bff; }
+nav input { flex: 2; padding: 8px; background: #000; color: #fff; border: 1px solid #333; }
+main { padding: 15px; }
+.post { background: #111; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.6); overflow: hidden; }
+.post-header { display: flex; align-items: center; padding: 10px; }
+.post-header img { width: 45px; height: 45px; border-radius: 50%; margin-right: 10px; }
+.channel-info b { display: block; font-size: 15px; }
+.channel-info span { color: #aaa; font-size: 13px; }
+img.post-photo { width: 100%; max-height: 400px; object-fit: cover; }
+.caption { padding: 10px; font-size: 15px; }
+.delete-btn { margin: 10px; background: red; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+.fab { position: fixed; bottom: 20px; right: 20px; background: #ff0000; color: white; font-size: 30px; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.5); z-index: 20; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 30; }
+.modal-content { background: #111; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; color: #fff; }
+.modal-content input, .modal-content textarea, .modal-content button { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: 1px solid #333; font-size: 14px; background: #222; color: #fff; }
+.modal-content button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+</style>
 </head>
 <body>
+
 <header>😈 DevilWall</header>
 <nav>
   <button id="tabPosts" class="active">Home</button>
   <button id="tabChannel">My Channel</button>
   <input type="text" id="searchInput" placeholder="Search @username">
 </nav>
+
 <main>
   <div id="posts"></div>
   <div id="channelInfo" style="display:none;"></div>
 </main>
+
 <div class="fab" onclick="openUploadModal()">+</div>
 
 <!-- Upload Modal -->
@@ -63,144 +66,113 @@
   </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+let channel = JSON.parse(localStorage.getItem("channel") || "null");
 
-let channel = null;
-let posts = [];
-
-document.getElementById("tabPosts").onclick = () => { switchTab("posts"); renderPosts(); };
-document.getElementById("tabChannel").onclick = () => { switchTab("channel"); renderMyChannel(); };
-document.getElementById("searchInput").addEventListener("keyup", (e) => { if (e.key === "Enter") searchChannel(); });
+document.getElementById("tabPosts").onclick = ()=>{ switchTab("posts"); renderPosts(); };
+document.getElementById("tabChannel").onclick = ()=>{ switchTab("channel"); renderMyChannel(); };
+document.getElementById("searchInput").addEventListener("keyup", (e)=>{ if(e.key==="Enter") searchChannel(); });
 
 switchTab("posts");
-fetchChannel();
-fetchPosts();
+renderPosts();
+renderMyChannel();
 
-function switchTab(tab) {
-  document.getElementById("posts").style.display = tab === "posts" ? "block" : "none";
-  document.getElementById("channelInfo").style.display = tab === "channel" ? "block" : "none";
-  document.getElementById("tabPosts").classList.toggle("active", tab === "posts");
-  document.getElementById("tabChannel").classList.toggle("active", tab === "channel");
+function switchTab(tab){
+  document.getElementById("posts").style.display = tab==="posts" ? "block" : "none";
+  document.getElementById("channelInfo").style.display = tab==="channel" ? "block" : "none";
+  document.getElementById("tabPosts").classList.toggle("active", tab==="posts");
+  document.getElementById("tabChannel").classList.toggle("active", tab==="channel");
 }
 
-function openUploadModal() { 
-  if (!channel) { alert("PLEASE CREATE A CHANNEL FIRST"); return; } 
-  document.getElementById("uploadModal").style.display = "flex"; 
+function openUploadModal(){ 
+  if(!channel){ alert("PLEASE CREATE A CHANNEL FIRST"); return; } 
+  document.getElementById("uploadModal").style.display="flex"; 
 }
-function openEditChannel() { 
-  document.getElementById("channelModal").style.display = "flex"; 
-  if(channel) { document.getElementById("channelName").value = channel.name; document.getElementById("channelUsername").value = channel.username; } 
+function openEditChannel(){ 
+  document.getElementById("channelModal").style.display="flex"; 
+  if(channel){
+    document.getElementById("channelName").value=channel.name;
+    document.getElementById("channelUsername").value=channel.username;
+  }
 }
-function closeModal(id){ document.getElementById(id).style.display = "none"; }
+function closeModal(id){ document.getElementById(id).style.display="none"; }
 
-async function saveChannel() {
-  let name = document.getElementById("channelName").value.trim();
-  let username = document.getElementById("channelUsername").value.trim();
-  let logoFile = document.getElementById("logo").files[0];
-  if (!name || !username) { alert("Name and username required!"); return; }
-  let logoUrl = channel && channel.logo ? channel.logo : "";
-  if (logoFile) logoUrl = await readFileAsDataURL(logoFile);
-  channel = { name, username, logo: logoUrl };
-  await db.ref("channel").set(channel);
+async function saveChannel(){
+  let name=document.getElementById("channelName").value.trim();
+  let username=document.getElementById("channelUsername").value.trim();
+  let logoFile=document.getElementById("logo").files[0];
+  if(!name || !username){ alert("Name and username required!"); return; }
+  if(!username.startsWith("@")) username="@"+username;
+  let logoUrl=channel && channel.logo ? channel.logo : "";
+  if(logoFile) logoUrl=await readFileAsDataURL(logoFile);
+  channel={name, username, logo:logoUrl};
+  localStorage.setItem("channel", JSON.stringify(channel));
   renderMyChannel();
   closeModal("channelModal");
 }
 
-async function submitPost() {
-  const caption = document.getElementById("caption").value.trim();
-  const photoFile = document.getElementById("photo").files[0];
-  if(!caption && !photoFile){ alert("Please add caption or photo!"); return; }
-  let photoUrl = photoFile ? await readFileAsDataURL(photoFile) : null;
-  const newPost = { id: Date.now(), caption, photo: photoUrl, logo: channel.logo, channelName: channel.name, channelUsername: channel.username };
-  await db.ref("posts/" + newPost.id).set(newPost);
-  document.getElementById("caption").value = ""; document.getElementById("photo").value = "";
-  fetchPosts();
-  closeModal("uploadModal");
+async function submitPost(){
+  let caption=document.getElementById("caption").value.trim();
+  let photoFile=document.getElementById("photo").files[0];
+  if(!caption && !photoFile){ alert("Add caption or photo!"); return; }
+  let photoUrl=photoFile ? await readFileAsDataURL(photoFile) : null;
+  const newPost={id:Date.now(), caption, photo:photoUrl, logo:channel.logo, channelName:channel.name, channelUsername:channel.username};
+  posts.unshift(newPost);
+  localStorage.setItem("posts", JSON.stringify(posts));
+  document.getElementById("caption").value=""; document.getElementById("photo").value="";
+  renderPosts(); renderMyChannel(); closeModal("uploadModal");
 }
 
-async function fetchChannel(){
-  const snapshot = await db.ref("channel").get();
-  channel = snapshot.exists() ? snapshot.val() : null;
-  renderMyChannel();
-}
-
-async function fetchPosts(){
-  const snapshot = await db.ref("posts").get();
-  posts = snapshot.exists() ? Object.values(snapshot.val()).sort((a,b)=>b.id-a.id) : [];
-  renderPosts();
-}
-
-function renderPosts(list = posts){
-  const postsDiv = document.getElementById("posts");
-  postsDiv.innerHTML = "";
-  if(list.length === 0){ postsDiv.innerHTML = '<p style="text-align:center; color:gray;">NO CONTENT IS AVAILABLE</p>'; return; }
-  list.forEach(post => postsDiv.appendChild(makePost(post)));
+function renderPosts(list=posts){
+  const div=document.getElementById("posts");
+  div.innerHTML="";
+  if(list.length===0){ div.innerHTML='<p style="text-align:center; color:gray;">NO CONTENT IS AVAILABLE</p>'; return; }
+  list.forEach(p=>div.appendChild(makePost(p)));
 }
 
 function renderMyChannel(){
-  const div = document.getElementById("channelInfo");
-  div.innerHTML = "";
-  if(!channel){
-    div.innerHTML = `<p>You don't have a channel yet.</p><button onclick="openEditChannel()">Create Channel</button>`;
-    return;
-  }
-  div.innerHTML = `<h2>${channel.name}</h2><p><b>Username:</b> ${channel.username}</p>
+  const div=document.getElementById("channelInfo");
+  div.innerHTML="";
+  if(!channel){ div.innerHTML='<p>No channel yet.</p><button onclick="openEditChannel()">Create Channel</button>'; return; }
+  div.innerHTML=`<h2>${channel.name}</h2><p><b>Username:</b> ${channel.username}</p>
   <img src="${channel.logo}" style="width:60px;height:60px;border-radius:50%;background:#333;"><br><br>
   <button onclick="openEditChannel()">Edit Channel</button><h3>My Posts</h3>`;
-  let myPosts = posts.filter(p => p.channelUsername === channel.username);
-  if(myPosts.length===0){ div.innerHTML += `<p style="color:gray;">No posts yet.</p>`; }
+  let myPosts=posts.filter(p=>p.channelUsername.toLowerCase()===channel.username.toLowerCase());
+  if(myPosts.length===0){ div.innerHTML+='<p style="color:gray;">No posts yet.</p>'; }
   else{ myPosts.forEach(p=>div.appendChild(makePost(p))); }
 }
 
 function makePost(post){
-  const postDiv = document.createElement("div");
-  postDiv.className="post";
-  const header = document.createElement("div"); header.className="post-header";
+  const div=document.createElement("div"); div.className="post";
+  const header=document.createElement("div"); header.className="post-header";
   if(post.logo){ const img=document.createElement("img"); img.src=post.logo; header.appendChild(img); }
-  const infoDiv=document.createElement("div"); infoDiv.className="channel-info";
-  infoDiv.innerHTML=`<b>${post.channelName}</b><span>${post.channelUsername}</span>`;
-  header.appendChild(infoDiv); postDiv.appendChild(header);
-  if(post.photo){ const img=document.createElement("img"); img.src=post.photo; img.className="post-photo"; postDiv.appendChild(img); }
-  if(post.caption){ const p=document.createElement("div"); p.className="caption"; p.textContent=post.caption; postDiv.appendChild(p); }
+  const info=document.createElement("div"); info.className="channel-info";
+  info.innerHTML=`<b>${post.channelName}</b><span>${post.channelUsername}</span>`; header.appendChild(info);
+  div.appendChild(header);
+  if(post.photo){ const img=document.createElement("img"); img.src=post.photo; img.className="post-photo"; div.appendChild(img); }
+  if(post.caption){ const p=document.createElement("div"); p.className="caption"; p.textContent=post.caption; div.appendChild(p); }
   if(channel && post.channelUsername===channel.username){
-    const delBtn=document.createElement("button"); delBtn.className="delete-btn"; delBtn.textContent="Delete Post";
-    delBtn.onclick=()=>deletePost(post.id); postDiv.appendChild(delBtn);
+    const btn=document.createElement("button"); btn.className="delete-btn"; btn.textContent="Delete Post";
+    btn.onclick=()=>{ posts=posts.filter(x=>x.id!==post.id); localStorage.setItem("posts", JSON.stringify(posts)); renderPosts(); renderMyChannel(); };
+    div.appendChild(btn);
   }
-  return postDiv;
+  return div;
 }
-
-async function deletePost(id){ await db.ref("posts/"+id).remove(); fetchPosts(); fetchChannel(); }
 
 function searchChannel(){
   let query=document.getElementById("searchInput").value.trim().toLowerCase();
   if(!query){ renderPosts(); switchTab("posts"); return; }
   if(!query.startsWith("@")) query="@"+query;
-  let userPosts = posts.filter(p=>p.channelUsername.toLowerCase()===query);
+  let userPosts=posts.filter(p=>p.channelUsername.toLowerCase()===query.toLowerCase());
   const div=document.getElementById("channelInfo"); div.innerHTML="";
-  if(userPosts.length===0){ document.getElementById("posts").innerHTML=`<p style="text-align:center; color:gray;">No channel found for ${query}</p>`; switchTab("posts"); }
-  else{
-    div.innerHTML=`<h2>${userPosts[0].channelName}</h2><p><b>Username:</b> ${userPosts[0].channelUsername}</p>
-    <img src="${userPosts[0].logo}" style="width:60px;height:60px;border-radius:50%;background:#333;"><h3>Posts</h3>`;
-    userPosts.forEach(p=>div.appendChild(makePost(p)));
-    switchTab("channel");
-  }
+  if(userPosts.length===0){ document.getElementById("posts").innerHTML=`<p style="text-align:center;color:gray;">No channel for ${query}</p>`; switchTab("posts"); return; }
+  div.innerHTML=`<h2>${userPosts[0].channelName}</h2><p><b>Username:</b> ${userPosts[0].channelUsername}</p>
+  <img src="${userPosts[0].logo}" style="width:60px;height:60px;border-radius:50%;background:#333;"><h3>Posts</h3>`;
+  userPosts.forEach(p=>div.appendChild(makePost(p))); switchTab("channel");
 }
 
-function readFileAsDataURL(file){ return new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onload=e=>resolve(e.target.result); reader.onerror=reject; reader.readAsDataURL(file); }); }
+function readFileAsDataURL(file){ return new Promise((res,rej)=>{ const reader=new FileReader(); reader.onload=e=>res(e.target.result); reader.onerror=rej; reader.readAsDataURL(file); }); }
 </script>
 </body>
 </html>
