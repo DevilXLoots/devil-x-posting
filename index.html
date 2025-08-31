@@ -2,332 +2,240 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>😈 Devil x Posting</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- responsive -->
+  <title>Devil x Posting</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      background: #f1f1f1;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
     }
-
     header {
-      background: #202020;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    nav {
+      background: linear-gradient(to right, #000, #111, #222);
+      color: #fff;
+      padding: 10px 20px;
       display: flex;
-      background: #303030;
-    }
-    nav button {
-      flex: 1;
-      padding: 12px;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-    }
-    nav button.active {
-      background: #505050;
-    }
-
-    main {
-      padding: 15px;
-    }
-
-    .post {
-      background: white;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-
-    .post-header {
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 10px;
+      border-bottom: 2px solid red;
     }
-
-    .post-header img {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .channel-info b {
-      display: block;
-      font-size: 15px;
-    }
-    .channel-info span {
-      color: gray;
-      font-size: 13px;
-    }
-
-    img.post-photo {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-    }
-
-    .caption {
-      padding: 10px;
-      font-size: 15px;
-    }
-
-    .delete-btn {
-      margin: 10px;
+    .logo { font-size: 20px; font-weight: bold; color: red; }
+    .nav button {
       background: red;
-      color: white;
       border: none;
-      padding: 6px 12px;
+      color: #fff;
+      padding: 8px 15px;
+      margin-left: 8px;
+      cursor: pointer;
       border-radius: 5px;
-      cursor: pointer;
     }
-
-    /* Floating Upload Button */
-    .fab {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #cc0000;
-      color: white;
-      font-size: 30px;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      z-index: 20;
+    .nav button:hover { background: blue; }
+    #feed {
+      padding: 20px;
     }
-
-    /* Upload Modal */
+    .post {
+      background: #111;
+      border: 1px solid #333;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+    .post img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .hidden { display: none; }
     .modal {
-      display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.8);
       display: flex;
-      align-items: center;
       justify-content: center;
-      z-index: 30;
+      align-items: center;
     }
     .modal-content {
-      background: white;
+      background: #111;
       padding: 20px;
       border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
+      width: 350px;
+      color: #fff;
     }
-    .modal-content input, .modal-content textarea, .modal-content button {
+    input, textarea {
       width: 100%;
-      margin-bottom: 10px;
-      padding: 10px;
+      margin: 8px 0;
+      padding: 8px;
+      background: #222;
+      border: 1px solid #444;
       border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+      color: #fff;
     }
-    .modal-content button {
-      background: #cc0000;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .error { color: red; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <header>😈 Devil x Posting </header>
-  <nav>
-    <button id="tabPosts" class="active">Home</button>
-    <button id="tabChannel">My Channel</button>
-  </nav>
-
-  <main id="content">
-    <div id="posts">
-      <p id="emptyMsg" style="text-align:center; color:gray;">NO CONTENT IS AVAILABLE</p>
+  <header>
+    <div class="logo">Devil x Posting🔥</div>
+    <div class="nav">
+      <button onclick="showChannelForm()">Create Channel</button>
+      <button onclick="editChannel()">My Channel</button>
+      <button onclick="uploadPost()">+</button>
+      <input id="searchInput" placeholder="Search channel username..." onkeyup="searchChannel()" style="padding:5px; margin-left:10px;">
     </div>
+  </header>
 
-    <div id="channelInfo" style="display:none;">
-      <h2>My Channel</h2>
-      <p><b>Name:</b> <span id="myName">Not Set</span></p>
-      <p><b>Username:</b> <span id="myUser">@notset</span></p>
-      <img id="myLogo" src="" alt="No Logo" style="width:60px;height:60px;border-radius:50%;background:#ddd;">
-      <br><br>
-      <button onclick="editChannel()">Edit Channel</button>
-    </div>
-  </main>
+  <div id="feed">
+    <p id="noContent">NO CONTENT IS AVAILABLE</p>
+  </div>
 
-  <!-- Floating Upload Button -->
-  <div class="fab" onclick="openModal()">+</div>
-
-  <!-- Upload Modal -->
-  <div class="modal" id="uploadModal">
+  <!-- Channel Modal -->
+  <div id="channelModal" class="modal hidden">
     <div class="modal-content">
-      <h3>Create Post</h3>
-      <input type="text" id="channelName" placeholder="Channel Name" required>
-      <input type="text" id="channelUsername" placeholder="@ChannelUsername" required>
-      <input type="file" id="logo" accept="image/*">
-      <textarea id="caption" placeholder="Write a caption..." rows="3"></textarea>
+      <h3>Create Channel</h3>
+      <input id="channelName" placeholder="Channel Name">
+      <input id="channelUsername" placeholder="Channel Username (unique)">
+      <button onclick="saveChannel()">Save</button>
+      <button onclick="closeModal('channelModal')">Cancel</button>
+      <p id="channelError" class="error"></p>
+    </div>
+  </div>
+
+  <!-- Edit Channel Modal -->
+  <div id="editChannelModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Edit Channel</h3>
+      <input id="editChannelName" placeholder="New Channel Name">
+      <input id="editChannelUsername" placeholder="New Channel Username">
+      <button onclick="saveEditChannel()">Save</button>
+      <button onclick="closeModal('editChannelModal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Upload Post Modal -->
+  <div id="uploadModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Upload Post</h3>
+      <textarea id="caption" placeholder="Write a caption..."></textarea>
       <input type="file" id="photo" accept="image/*">
-      <button onclick="submitPost()">Upload</button>
-      <button onclick="closeModal()" style="background:gray;">Cancel</button>
+      <button onclick="savePost()">Upload</button>
+      <button onclick="closeModal('uploadModal')">Cancel</button>
+      <p id="uploadError" class="error"></p>
     </div>
   </div>
 
   <script>
-    const postsDiv = document.getElementById("posts");
-    const emptyMsg = document.getElementById("emptyMsg");
-    const modal = document.getElementById("uploadModal");
+    let channel = null;
+    let posts = [];
 
-    let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    let channel = JSON.parse(localStorage.getItem("channel") || '{"name":"","username":"","logo":""}');
-    renderPosts();
-    updateChannelInfo();
-
-    document.getElementById("tabPosts").onclick = () => switchTab("posts");
-    document.getElementById("tabChannel").onclick = () => switchTab("channelInfo");
-
-    function switchTab(tab) {
-      document.getElementById("posts").style.display = tab === "posts" ? "block" : "none";
-      document.getElementById("channelInfo").style.display = tab === "channelInfo" ? "block" : "none";
-      document.getElementById("tabPosts").classList.toggle("active", tab === "posts");
-      document.getElementById("tabChannel").classList.toggle("active", tab === "channelInfo");
+    function showChannelForm() {
+      document.getElementById("channelModal").classList.remove("hidden");
     }
 
-    function openModal() { modal.style.display = "flex"; }
-    function closeModal() { modal.style.display = "none"; }
-
-    async function submitPost() {
-      const caption = document.getElementById("caption").value.trim();
-      const photo = document.getElementById("photo").files[0];
-      const logo = document.getElementById("logo").files[0];
-      const channelName = document.getElementById("channelName").value.trim();
-      const channelUsername = document.getElementById("channelUsername").value.trim();
-
-      if (!caption && !photo) {
-        alert("Please add a caption or photo!");
+    function saveChannel() {
+      let name = document.getElementById("channelName").value.trim();
+      let username = document.getElementById("channelUsername").value.trim();
+      if (!name || !username) {
+        document.getElementById("channelError").innerText = "All fields are required!";
         return;
       }
-
-      let logoUrl = channel.logo;
-      let photoUrl = null;
-
-      if (logo) logoUrl = await readFileAsDataURL(logo);
-      if (photo) photoUrl = await readFileAsDataURL(photo);
-
-      // Save channel info
-      channel = { name: channelName, username: channelUsername, logo: logoUrl };
-      localStorage.setItem("channel", JSON.stringify(channel));
-
-      const newPost = {
-        id: Date.now(),
-        caption,
-        photo: photoUrl,
-        logo: logoUrl,
-        channelName,
-        channelUsername
-      };
-
-      posts.unshift(newPost);
-      localStorage.setItem("posts", JSON.stringify(posts));
-
-      renderPosts();
-      updateChannelInfo();
-      closeModal();
-    }
-
-    function renderPosts() {
-      postsDiv.innerHTML = "";
-
-      if (posts.length === 0) {
-        postsDiv.innerHTML = '<p id="emptyMsg" style="text-align:center; color:gray;">NO CONTENT IS AVAILABLE</p>';
-        return;
-      }
-
-      posts.forEach(post => {
-        const postDiv = document.createElement("div");
-        postDiv.className = "post";
-
-        const header = document.createElement("div");
-        header.className = "post-header";
-
-        if (post.logo) {
-          const logoImg = document.createElement("img");
-          logoImg.src = post.logo;
-          header.appendChild(logoImg);
-        }
-
-        const infoDiv = document.createElement("div");
-        infoDiv.className = "channel-info";
-        infoDiv.innerHTML = `<b>${post.channelName}</b><span>${post.channelUsername}</span>`;
-        header.appendChild(infoDiv);
-
-        postDiv.appendChild(header);
-
-        if (post.photo) {
-          const img = document.createElement("img");
-          img.src = post.photo;
-          img.className = "post-photo";
-          postDiv.appendChild(img);
-        }
-
-        if (post.caption) {
-          const p = document.createElement("div");
-          p.className = "caption";
-          p.textContent = post.caption;
-          postDiv.appendChild(p);
-        }
-
-        const delBtn = document.createElement("button");
-        delBtn.className = "delete-btn";
-        delBtn.textContent = "Delete Post";
-        delBtn.onclick = () => deletePost(post.id);
-        postDiv.appendChild(delBtn);
-
-        postsDiv.appendChild(postDiv);
-      });
-    }
-
-    function deletePost(id) {
-      posts = posts.filter(p => p.id !== id);
-      localStorage.setItem("posts", JSON.stringify(posts));
-      renderPosts();
-    }
-
-    function updateChannelInfo() {
-      document.getElementById("myName").textContent = channel.name || "Not Set";
-      document.getElementById("myUser").textContent = channel.username || "@notset";
-      document.getElementById("myLogo").src = channel.logo || "";
+      channel = { name, username };
+      document.getElementById("channelError").innerText = "";
+      closeModal("channelModal");
+      alert("Channel created successfully!");
     }
 
     function editChannel() {
-      openModal();
-      document.getElementById("channelName").value = channel.name;
-      document.getElementById("channelUsername").value = channel.username;
+      if (!channel) {
+        alert("No channel found. Please create a channel first!");
+        return;
+      }
+      document.getElementById("editChannelModal").classList.remove("hidden");
     }
 
-    function readFileAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+    function saveEditChannel() {
+      let newName = document.getElementById("editChannelName").value.trim();
+      let newUsername = document.getElementById("editChannelUsername").value.trim();
+      if (newName) channel.name = newName;
+      if (newUsername) channel.username = newUsername;
+      closeModal("editChannelModal");
+      alert("Channel updated successfully!");
+    }
+
+    function uploadPost() {
+      if (!channel) {
+        alert("PLEASE CREATE A CHANNEL FIRST");
+        return;
+      }
+      document.getElementById("uploadModal").classList.remove("hidden");
+    }
+
+    function savePost() {
+      let caption = document.getElementById("caption").value.trim();
+      let fileInput = document.getElementById("photo");
+      let imgURL = "";
+      if (fileInput.files.length > 0) {
+        imgURL = URL.createObjectURL(fileInput.files[0]);
+      }
+      if (!caption && !imgURL) {
+        document.getElementById("uploadError").innerText = "Caption or Photo required!";
+        return;
+      }
+      posts.unshift({ caption, imgURL, channel: channel.name });
+      renderPosts();
+      closeModal("uploadModal");
+      document.getElementById("caption").value = "";
+      fileInput.value = "";
+    }
+
+    function renderPosts() {
+      let feed = document.getElementById("feed");
+      feed.innerHTML = "";
+      if (posts.length === 0) {
+        feed.innerHTML = "<p id='noContent'>NO CONTENT IS AVAILABLE</p>";
+        return;
+      }
+      posts.forEach(p => {
+        let postDiv = document.createElement("div");
+        postDiv.className = "post";
+        postDiv.innerHTML = `<strong>${p.channel}</strong><p>${p.caption}</p>`;
+        if (p.imgURL) {
+          let img = document.createElement("img");
+          img.src = p.imgURL;
+          postDiv.appendChild(img);
+        }
+        feed.appendChild(postDiv);
       });
+    }
+
+    function searchChannel() {
+      let query = document.getElementById("searchInput").value.trim().toLowerCase();
+      let feed = document.getElementById("feed");
+      if (!query) {
+        renderPosts();
+        return;
+      }
+      let filtered = posts.filter(p => channel && channel.username.toLowerCase().includes(query));
+      feed.innerHTML = "";
+      if (filtered.length === 0) {
+        feed.innerHTML = "<p>No channel found with that username</p>";
+      } else {
+        filtered.forEach(p => {
+          let postDiv = document.createElement("div");
+          postDiv.className = "post";
+          postDiv.innerHTML = `<strong>${p.channel}</strong><p>${p.caption}</p>`;
+          if (p.imgURL) {
+            let img = document.createElement("img");
+            img.src = p.imgURL;
+            postDiv.appendChild(img);
+          }
+          feed.appendChild(postDiv);
+        });
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add("hidden");
     }
   </script>
 </body>
